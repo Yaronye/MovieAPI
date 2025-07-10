@@ -1,3 +1,12 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using MovieAPI.Extensions;
+using MovieAPI.Models;
+
+/*using (MovieContext context = new MovieContext())
+{
+    context.Database.EnsureCreated();
+}*/
 
 namespace MovieAPI
 {
@@ -6,6 +15,8 @@ namespace MovieAPI
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Services.AddDbContext<MovieContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("MovieContext") ?? throw new InvalidOperationException("Connection string 'MovieContext' not found.")));
 
             // Add services to the container.
 
@@ -23,12 +34,16 @@ namespace MovieAPI
 
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
-
+            //app.UseAuthorization();
 
             app.MapControllers();
 
+            //app.See
+
             app.Run();
         }
+
+        //KC KU
+
     }
 }

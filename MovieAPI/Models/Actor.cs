@@ -3,7 +3,9 @@
     public class Actor
     {
         public int Id { get; set; }
-        string Name { get; set; }
-        string BirthYear { get; set; }
+        public string? Name { get; set; }
+        public int BirthYear { get; set; }
+
+        public ICollection<Movie> Movies { get; set; } = new List<Movie>();
     }
 }
