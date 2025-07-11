@@ -6,7 +6,7 @@ namespace MovieAPI.Models
     {
         public int Id { get; set; }
         public string Synoposis { get; set; } = string.Empty;
-        public Languages Language { get; set; }
+        public LanguagesEnum Language { get; set; }
         public int Budget { get; set; }
 
         public int MovieId { get; set; }

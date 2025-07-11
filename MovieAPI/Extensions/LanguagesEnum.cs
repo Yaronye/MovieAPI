@@ -1,6 +1,6 @@
 ﻿namespace MovieAPI.Extensions
 {
-    public enum Languages
+    public enum LanguagesEnum
     {
         English = 0,
         Swedish = 1,
