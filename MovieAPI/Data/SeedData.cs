@@ -5,6 +5,7 @@ using MovieAPI.Models;
 using System;
 using MovieAPI.Extensions;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
+using static Bogus.DataSets.Name;
 
 namespace MovieAPI.Data
 {
@@ -15,21 +16,23 @@ namespace MovieAPI.Data
         {
             if (await context.Movies.AnyAsync()) return;
             var movies = GenerateMovies(20);
+            await context.AddRangeAsync(movies);
+            await context.SaveChangesAsync();
         }
         private static List<Movie> GenerateMovies(int numberOfMovies)
         {
             var movies = new List<Movie>();
-            var genres = GenerateGenres();
-            var actorList = GenerateActors(faker.Random.Int(1, 40));
-            var reviewList = GenerateReviews(faker.Random.Int(3, 7));
-            MovieDetails details = GenerateMovieDetails();
 
             for (int i = 0; i < numberOfMovies; i++)
             {
                 var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(faker.Lorem.Word());
                 var year = DateTime.Now.Year;
                 var duration = faker.Random.Int(20, 201);
-                var movie = new Movie { Title = title, Year = year, Duration = duration, MovieDetails =  };
+                var genres = GenerateGenres(faker.Random.Int(1, 3));
+                var actorList = GenerateActors(faker.Random.Int(1, 40));
+                var reviewList = GenerateReviews(faker.Random.Int(3, 7));
+                MovieDetails details = GenerateMovieDetails();
+                var movie = new Movie { Title = title, Year = year, Duration = duration, MovieDetails =  details};
 
                 movies.Add(movie);
             }
@@ -53,19 +56,26 @@ namespace MovieAPI.Data
         private static MovieDetails GenerateMovieDetails()
         {
             var synopsis = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(faker.Lorem.Paragraph());
-            var randInt = faker.Random.Int(0, Enum.GetNames(typeof(LanguagesEnum)).Length);
-            var language = (LanguagesEnum)randInt;
+            List<String> allLanguages = ["English",
+        "Swedish",
+        "Danish",
+        "Finnish",
+        "Kurdish",
+        "Russian",
+        "Mandarin",
+        "Cantonese"];
+            var randInt = faker.Random.Int(0, allLanguages.Count());
+            var language = allLanguages[randInt];
             var budget = faker.Random.Int(60000, 2000001);
             var details = new MovieDetails { Budget = budget, Language = language, Synoposis = synopsis };            
             return details;
         }
 
-        private static List<Genre> GenerateGenres()
+        private static List<Genre> GenerateGenres(int nrOfGenres)
         { 
             List<String> allGenres = ["Horror", "Action", "Fantasy","Adventure", "Musical", "Thriller", "Animated", "Family", "Comedy", "Romance"];
             List<Genre> genres = new List<Genre>();
-            int nrGenres = faker.Random.Int(0, 4);
-            for (int i = 0; i< nrGenres; i++)
+            for (int i = 0; i< nrOfGenres; i++)
             {
                 int randInt = faker.Random.Int(0, allGenres.Count);
                 genres.Add(new Genre { Name = allGenres[randInt]});

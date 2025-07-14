@@ -12,7 +12,7 @@ namespace MovieAPI
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddDbContext<MovieContext>(options =>
@@ -30,20 +30,16 @@ namespace MovieAPI
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
+                await app.SeedDataAsync();
             }
 
             app.UseHttpsRedirection();
 
-            //app.UseAuthorization();
+            app.UseAuthorization();
 
             app.MapControllers();
 
-            //app.See
-
             app.Run();
         }
-
-        //KC KU
-
     }
 }
