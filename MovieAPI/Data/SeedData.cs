@@ -15,24 +15,38 @@ namespace MovieAPI.Data
         internal static async Task InitAsync(MovieContext context)
         {
             if (await context.Movies.AnyAsync()) return;
-            var movies = GenerateMovies(20);
+            var genres = GenerateGenres();
+            await context.AddRangeAsync(genres);
+
+            var movies = GenerateMovies(20, genres);
             await context.AddRangeAsync(movies);
             await context.SaveChangesAsync();
         }
-        private static List<Movie> GenerateMovies(int numberOfMovies)
+        private static List<Movie> GenerateMovies(int numberOfMovies, List<Genre> genresL)
         {
             var movies = new List<Movie>();
 
             for (int i = 0; i < numberOfMovies; i++)
             {
+
                 var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(faker.Lorem.Word());
                 var year = DateTime.Now.Year;
                 var duration = faker.Random.Int(20, 201);
-                var genres = GenerateGenres(faker.Random.Int(1, 3));
+                var genres = genresL[faker.Random.Int(0, genresL.Count - 1)];
                 var actorList = GenerateActors(faker.Random.Int(1, 40));
                 var reviewList = GenerateReviews(faker.Random.Int(3, 7));
                 MovieDetails details = GenerateMovieDetails();
-                var movie = new Movie { Title = title, Year = year, Duration = duration, MovieDetails =  details};
+                
+                var movie = new Movie
+                {
+                    Title = title,
+                    Year = year,
+                    Duration = duration,
+                    MovieDetails = details,
+                    Actors = actorList,
+                    Reviews = reviewList,
+                    Genre = genres
+                };
 
                 movies.Add(movie);
             }
@@ -64,35 +78,35 @@ namespace MovieAPI.Data
         "Russian",
         "Mandarin",
         "Cantonese"];
-            var randInt = faker.Random.Int(0, allLanguages.Count());
+            var randInt = faker.Random.Int(0, allLanguages.Count()-1);
             var language = allLanguages[randInt];
             var budget = faker.Random.Int(60000, 2000001);
-            var details = new MovieDetails { Budget = budget, Language = language, Synoposis = synopsis };            
+            var details = new MovieDetails { Budget = budget, Language = language, Synoposis = synopsis };
             return details;
         }
 
-        private static List<Genre> GenerateGenres(int nrOfGenres)
-        { 
-            List<String> allGenres = ["Horror", "Action", "Fantasy","Adventure", "Musical", "Thriller", "Animated", "Family", "Comedy", "Romance"];
+        private static List<Genre> GenerateGenres()
+        {
+            List<String> allGenres = ["Horror", "Action", "Fantasy", "Adventure", "Musical", "Thriller", "Animated", "Family", "Comedy", "Romance"];
             List<Genre> genres = new List<Genre>();
-            for (int i = 0; i< nrOfGenres; i++)
+            for (int i = 0; i < allGenres.Count; i++)
             {
-                int randInt = faker.Random.Int(0, allGenres.Count);
-                genres.Add(new Genre { Name = allGenres[randInt]});
-                allGenres.RemoveAt(randInt);
+                //int randInt = faker.Random.Int(0, allGenres.Count);
+                genres.Add(new Genre { Name = allGenres[i] });
+                //  allGenres.RemoveAt(randInt);
             }
             return genres;
         }
-        
+
         private static List<Review> GenerateReviews(int nrOfReviews)
         {
             var reviews = new List<Review>();
-            for (int i = 0; nrOfReviews > 0; i++) 
+            for (int i = 0; i < nrOfReviews; i++)
             {
                 var reviewerName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(faker.Name.FullName());
-                var comment = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(faker.Lorem.ToString());
+                var comment = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(faker.Lorem.Paragraph());
                 var rating = faker.Random.Int(0, 11);
-                var review = new Review { ReviewerName = reviewerName, Comment = comment, Rating = rating};
+                var review = new Review { ReviewerName = reviewerName, Comment = comment, Rating = rating };
                 reviews.Add(review);
             }
             return reviews;

@@ -22,9 +22,22 @@ namespace MovieAPI.Controllers
 
         // GET: api/Movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Movie>>> GetMovies()
+        public async Task<ActionResult<IEnumerable<MovieDTO>>> GetMovies()
         {
-            return await _context.Movies.ToListAsync();
+            IEnumerable<MovieDTO> dtos = await _context.Movies.Select(m => new MovieDTO
+            {
+                Id = m.Id,
+                Title = m.Title,
+                Year = m.Year,
+                Duration = m.Duration,
+                GenreName = m.Genre.Name,
+                Budget = m.MovieDetails.Budget,
+                Language = m.MovieDetails.Language,
+                Synoposis = m.MovieDetails.Synoposis,
+
+            }).ToListAsync();
+
+            return Ok(dtos);
         }
 
         // GET: api/Movies/5
