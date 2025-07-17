@@ -19,7 +19,21 @@ public class MovieContext : DbContext
     public DbSet<MovieDetails> MovieDetails { get; set; } = default!;
     public DbSet<Actor> Actors { get; set; } = default!;
     public DbSet<Review> Reviews { get; set; } = default!;
+    public DbSet<Genre> Genres { get; set; } = default!;
 
+    //protected override void OnModelCreating(ModelBuilder modelBuilder)
+    //{
+    //    base.OnModelCreating(modelBuilder);
+
+    //    modelBuilder.Entity<Movie>()
+    //        .HasOne(m => m.MovieDetails)
+    //        .WithOne(d => d.Movie)
+    //        .HasForeignKey<MovieDetails>(d => d.MovieId);
+
+    //    modelBuilder.Entity<MovieDetails>()
+    //        .HasIndex(d => d.MovieId)
+    //        .IsUnique(); //ensures one-to-one
+    //}
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);

@@ -6,6 +6,7 @@ using System;
 using MovieAPI.Extensions;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using static Bogus.DataSets.Name;
+using MovieAPI.Migrations;
 
 namespace MovieAPI.Data
 {
@@ -18,11 +19,15 @@ namespace MovieAPI.Data
             var genres = GenerateGenres();
             await context.AddRangeAsync(genres);
 
-            var movies = GenerateMovies(20, genres);
+            if (await context.Movies.AnyAsync()) return;
+            var actors = GenerateActors(80);
+            await context.AddRangeAsync(actors);
+
+            var movies = GenerateMovies(20, genres, actors);
             await context.AddRangeAsync(movies);
             await context.SaveChangesAsync();
         }
-        private static List<Movie> GenerateMovies(int numberOfMovies, List<Genre> genresL)
+        private static List<Movie> GenerateMovies(int numberOfMovies, List<Genre> genresList, List<Actor> actorList)
         {
             var movies = new List<Movie>();
 
@@ -31,23 +36,25 @@ namespace MovieAPI.Data
 
                 var title = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(faker.Lorem.Word());
                 var year = DateTime.Now.Year;
-                var duration = faker.Random.Int(20, 201);
-                var genres = genresL[faker.Random.Int(0, genresL.Count - 1)];
-                var actorList = GenerateActors(faker.Random.Int(1, 40));
-                var reviewList = GenerateReviews(faker.Random.Int(3, 7));
                 MovieDetails details = GenerateMovieDetails();
-                
+                var duration = faker.Random.Int(20, 201);
+                var genres = genresList[faker.Random.Int(0, genresList.Count - 1)];
+                var reviewList = GenerateReviews(faker.Random.Int(3, 7));
+                var actors = new List<Actor>();
+                for(int j =0;  j < faker.Random.Int(2, 50); j++)
+                {
+                    actors.Add(actorList[j]);
+                }
                 var movie = new Movie
                 {
                     Title = title,
                     Year = year,
                     Duration = duration,
                     MovieDetails = details,
-                    Actors = actorList,
+                    Actors = actors,
                     Reviews = reviewList,
                     Genre = genres
                 };
-
                 movies.Add(movie);
             }
             return movies;
@@ -64,7 +71,6 @@ namespace MovieAPI.Data
                 actors.Add(actor);
             }
             return actors;
-
         }
 
         private static MovieDetails GenerateMovieDetails()
@@ -91,9 +97,7 @@ namespace MovieAPI.Data
             List<Genre> genres = new List<Genre>();
             for (int i = 0; i < allGenres.Count; i++)
             {
-                //int randInt = faker.Random.Int(0, allGenres.Count);
                 genres.Add(new Genre { Name = allGenres[i] });
-                //  allGenres.RemoveAt(randInt);
             }
             return genres;
         }
