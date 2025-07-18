@@ -16,4 +16,7 @@ public class MovieUpdateDto
 
     [Range(1, 1200)]
     public int Duration { get; set; }
+
+    [Required]
+    public int GenreId { get; set; }
 }

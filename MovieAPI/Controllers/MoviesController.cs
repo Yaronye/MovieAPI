@@ -32,12 +32,7 @@ namespace MovieAPI.Controllers
                 Year = m.Year,
                 Duration = m.Duration,
                 Genre = m.Genre.Name,
-                Budget = m.MovieDetails.Budget,
-                Language = m.MovieDetails.Language,
-                Synopsis = m.MovieDetails.Synopsis,
-
                 }).ToListAsync();
-
 
             return Ok(dtos);
         }
@@ -57,20 +52,29 @@ namespace MovieAPI.Controllers
                 Year = m.Year,
                 Duration = m.Duration,
                 Genre = m.Genre.Name,
-                Budget = m.MovieDetails.Budget,
-                Language = m.MovieDetails.Language,
-                Synopsis = m.MovieDetails.Synopsis
             })
             .FirstOrDefaultAsync();
 
-            //var movie = await _context.Movies.FindAsync(id);
-
-            //if (movie == null)
-            //{
-            //    return NotFound();
-            //}
-
             return movieDto;
+        }
+
+        // GET: api/Movies/5/details
+        [HttpGet("{id}/details")]
+        public async Task<ActionResult<MovieDetailsDto>> GetMovieDetails(int id)
+        {
+            var detailsDto = await _context.MovieDetails
+            .Where(m => m.MovieId == id)
+            .Select(m => new MovieDetailsDto
+            {
+                Id = m.Id,
+                Budget = m.Budget,
+                Language = m.Language,
+                Synopsis = m.Synopsis,
+                MovieId = m.MovieId
+            })
+            .FirstOrDefaultAsync();
+
+            return detailsDto;
         }
 
         // PUT: api/Movies/5
@@ -88,6 +92,11 @@ namespace MovieAPI.Controllers
                 return BadRequest(ModelState);
             }
 
+            if(_context.Genres.Where(m => m.Id == updateDto.GenreId).Select(m => m.Id).FirstOrDefault() == 0)
+            {
+                return BadRequest();
+            }
+
             var movie = await _context.Movies.FindAsync(id);
             if (movie == null)
             {
@@ -97,6 +106,7 @@ namespace MovieAPI.Controllers
             movie.Title = updateDto.Title;
             movie.Year = updateDto.Year;
             movie.Duration = updateDto.Duration;
+            movie.GenreId = updateDto.GenreId;
 
             try
             {
@@ -117,37 +127,18 @@ namespace MovieAPI.Controllers
             return NoContent();
         }
 
-            //if (id != movie.Id)
-            //{
-            //    return BadRequest();
-            //}
-
-            //_context.Entry(movie).State = EntityState.Modified;
-
-            //try
-            //{
-            //    await _context.SaveChangesAsync();
-            //}
-            //catch (DbUpdateConcurrencyException)
-            //{
-            //    if (!MovieExists(id))
-            //    {
-            //        return NotFound();
-            //    }
-            //    else
-            //    {
-            //        throw;
-            //    }
-            //}
-
-            //return NoContent();
-        }
-
         // POST: api/Movies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Movie>> PostMovie(Movie movie)
+        public async Task<ActionResult<Movie>> PostMovie(MovieCreateDto movieCreateDto)
         {
+            var movie = new Movie
+            {
+                Title = movieCreateDto.Title,
+                Year = movieCreateDto.Year,
+                Duration = movieCreateDto.Duration,
+                GenreId = movieCreateDto.GenreId
+            };
             _context.Movies.Add(movie);
             await _context.SaveChangesAsync();
 

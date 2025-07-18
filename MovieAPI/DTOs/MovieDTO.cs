@@ -10,8 +10,4 @@ public class MovieDto
     public int Year { get; set; }
     public int Duration { get; set; }
     public string Genre { get; set; } = null!;
-
-    public string Synopsis { get; set; } = string.Empty;
-    public string Language { get; set; } = string.Empty;
-    public int Budget { get; set; }
 }

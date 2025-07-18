@@ -87,7 +87,7 @@ namespace MovieAPI.Data
             var randInt = faker.Random.Int(0, allLanguages.Count()-1);
             var language = allLanguages[randInt];
             var budget = faker.Random.Int(60000, 2000001);
-            var details = new MovieDetails { Budget = budget, Language = language, Synoposis = synopsis };
+            var details = new MovieDetails { Budget = budget, Language = language, Synopsis = synopsis };
             return details;
         }
 
